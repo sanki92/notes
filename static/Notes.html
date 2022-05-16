@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/profile.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    <title>Notes</title>
+</head>
+<body>
+    <div style="width:100%;" id="alertBox"></div>
+    <h2 style="margin-top:1rem;">Write a Note</h2>
+    <button class="btn-shanks"  style="position: absolute; right: 2rem;top:4rem;" onclick=logout()>Log Out</button>
+    <div class="textarea-div">
+        <textarea id="txtarea-title" placeholder="Title"></textarea>
+        <textarea id="txtarea-txt" placeholder="Description"></textarea>
+    </div>
+    <button class="btn-shanks" id="btn-note" type="submit">Create a note</button>
+
+    <h4 id="message"></h4>
+    <div class="notes-container">
+   
+    </div>
+
+
+
+    <script>
+        var alertBox = document.getElementById("alertBox")
+// LOGOUT
+    const logout=()=>{
+            console.log("working")
+            location.href="/Home.html";
+            localStorage.clear();
+        }
+    const reload=()=>{
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
+        scrollTo(0)
+    }
+    const alert=(msg,type)=>{
+        
+        return alertBox.innerHTML=`<div class="alert alert-${type} position-fixed alert-dismissible fade show" role="alert">
+            <strong>${msg}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`
+
+    }
+
+
+        // STATUS CHECK
+        checkstat()
+    function checkstat(){
+        if(localStorage.length==0){
+            alert("Login To Create & Check Your Notes");
+            location.href="/Home.html"
+            document.body.innerHTML="<h1>Login To Create & Check Your Notes</h1>"
+        }
+    }
+
+    // CREATE NOTES
+    const btnNote = document.querySelector("#btn-note");
+    
+    btnNote.addEventListener('click',createNote)
+    
+    async function createNote(){
+       const txtarea_title = document.querySelector("#txtarea-title").value;
+       const txtarea_txt = document.querySelector("#txtarea-txt").value;
+
+        console.log("Title: ",txtarea_title,"Description: ",txtarea_txt)
+        
+        const result = await fetch('/api/create-note',{
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            body: JSON.stringify({
+                token: localStorage.getItem('token'),
+                txtarea_title,
+                txtarea_txt
+            })
+        }).then((res)=>res.json())
+
+        if(result.status === 'ok'){
+        
+           alert(result.message,"success")
+            reload()
+           }
+           else{
+            alert(result.message,"success")
+           }
+        console.log(result);
+        
+    }
+
+  
+
+
+        // GET NOTES
+        getNotes()
+        async function getNotes(){
+            const result = await fetch('/api/get-note',{
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            body: JSON.stringify({
+                token: localStorage.getItem('token'),
+                // userID:localStorage.getItem("userID")
+            })
+        }).then((res)=>res.json())
+      
+        document.querySelector('.notes-container').innerHTML =  result.Notes.map(note => 
+                    `<div class="note">
+                    <ion-icon onclick="deleteNote(this.id)"  id=${note._id} name="trash"></ion-icon>
+                    <h4 class="title">${note.txtarea_title} </h4>
+                    <p class="text">${note.txtarea_txt}</p>
+                    </div>`
+                 
+        ).join('')   
+        // console.log(result);
+        document.getElementById("message").innerText=result.message
+    }
+
+    // DELETE NOTES     
+    async function deleteNote(id){
+        console.log(id)
+        const result = await fetch('/api/del-note',{
+            method: 'DELETE',
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            body: JSON.stringify({
+                token: localStorage.getItem('token'),
+                noteID:id
+            })
+        }).then((res)=>res.json())
+        console.log(result)
+        alert(result.message+" with Title: "+result.response.txtarea_title,"warning")
+        reload()
+  }
+
+
+
+    
+
+    </script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+
+</html>

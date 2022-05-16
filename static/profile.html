@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/profile.css">
+    <title>Admin's Pannel</title>
+</head>
+<body>
+    <h1 style="text-transform: uppercase;" id="name">Sign In to view your profile</h1>
+    <!-- <h3>Write a Note</h3>
+    <button  style="position: absolute; right: 2rem;top:2rem;" onclick=logout()>Log Out</button>
+    <div class="textarea-div">
+        <textarea id="txtarea-title" placeholder="Title"></textarea>
+        <textarea id="txtarea-txt" placeholder="Description"></textarea>
+    </div>
+    <button id="btn-note" type="submit">Create a note</button>
+
+    <h4 id="message"></h4>
+    <div class="notes container">
+        <div class="note">
+            <h4 class="title">Lorem ipsum dolor sit.</h4>
+            <p class="text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eaque perspiciatis esse aliquam nobis accusantium consectetur, rem itaque reprehenderit molestiae nihil!</p>
+        </div>
+    </div> -->
+</body>
+<script>
+
+    // MUST MAKE A CALL TO BACKEND! 
+    const logout=()=>{
+        console.log("working")
+        location.href="/Home.html";
+        localStorage.clear();
+    }
+
+
+    // sending token and fetching userID
+    const name = document.querySelector("#name");
+    const btn = document.querySelector("#btn");
+    // btn.addEventListener('click', getDetails);
+    async function getDetails(){
+        // event.preventDefault();
+        
+        const result = await fetch('/api/profile',{
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            body: JSON.stringify({
+                token: localStorage.getItem('token'),
+                userID: localStorage.getItem('userID')
+            })
+        })
+        const parsed = await result.json()
+        console.log(parsed);
+        name.innerHTML="Hello "+parsed.username
+    }
+    getDetails()
+
+
+
+
+    // // submitting notes
+    // const btnNote = document.querySelector("#btn-note");
+    
+    // btnNote.addEventListener('click',createNote)
+    
+    // async function createNote(){
+    //    const txtarea_title = document.querySelector("#txtarea-title").value;
+    //    const txtarea_txt = document.querySelector("#txtarea-txt").value;
+
+    //     console.log("Title: ",txtarea_title,"Description: ",txtarea_txt)
+        
+    //     const result = await fetch('/api/create-note',{
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type' : 'application/json'
+    //         },
+    //         body: JSON.stringify({
+    //             token: localStorage.getItem('token'),
+    //             txtarea_title,
+    //             txtarea_txt
+    //         })
+    //     }).then((res)=>res.json())
+        
+    //     console.log(result);
+        
+    // }
+
+
+    //     // GET NOTES
+    //     getNotes()
+    //     async function getNotes(){
+    //         const result = await fetch('/api/get-note',{
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type' : 'application/json'
+    //         },
+    //         body: JSON.stringify({
+    //             token: localStorage.getItem('token'),
+    //             // userID:localStorage.getItem("userID")
+    //         })
+    //     }).then((res)=>res.json())
+        
+    //     console.log(result);
+    //     }
+
+
+    
+
+
+
+
+
+</script>
+</html>

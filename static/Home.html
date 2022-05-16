@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <div id="button">
+        <div></div>
+        <p id="su" >SignUp</p>
+        <p id="si" style="opacity: .5;">SignIn</p>
+    </div>
+    <div class="form">
+        <div class="inner-form">
+
+            <div id="signup-form" class="signup-form">
+            <div style="display: flex; flex-direction: row; width: 100%;">
+                <input type="text" autocomplete="off"  id="fname" placeholder="First Name" >
+                <input type="text" autocomplete="off"  id="lname" placeholder="Last Name" >
+            </div>
+            <input style="width: 80%" type="text" autocomplete="off"  id="username" placeholder="Username" >
+            <input style="width: 80%" type="number" autocomplete="off"  id="phnum" placeholder="Phone Number" >
+            <div style="display: flex; flex-direction: row; width: 100%;">
+                <input type="password" autocomplete="off"  id="password" placeholder="Password" >
+                <input type="password" autocomplete="off"  id="cpassword" placeholder="Confirm Password" >
+            </div>
+            <input id="signup-submit" class="btn" type="submit" value="SignUp" >
+             </div>
+
+        </div>    
+        <div class="inner-form">
+            <div id="signin-form" class="signin-form">
+                <div style="width:100%;height:60%; display: flex; flex-direction: column;align-items: center; justify-content: space-between;">
+                    <input style="width: 80%" type="text" autocomplete="off"  id="susername" placeholder="Username" >
+                    <input style="width: 80%" type="password" autocomplete="off"  id="spassword" placeholder="Password" >
+                    <input id="signin-submit" class="btn" type="submit" value="SignIn" >
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function(){
+            $("#button #su").click(function(){
+                $("#button div").css({transform:"translate(0)"})
+                $(this).css({opacity:"1"})
+                $("#button #si").css({opacity:".5"})
+                $(".form").animate({ scrollLeft:0 }, 400);
+            })
+            $("#button #si").click(function(){
+                $("#button div").css({transform:"translate(105px)"})
+                $(this).css({opacity:"1"})
+                $("#button #su").css({opacity:".5"})
+                $(".form").animate({ scrollLeft:500 }, 400);
+            })
+        })
+    </script>
+
+    <script>
+        
+        // SIGNUP
+        const signUp = document.querySelector("#signup-submit");
+        signUp.addEventListener('click', regUser);
+
+        // 1. Send data as JSON (very common) USING
+        // 2. Send data as urlencoded (by default)
+        function turnlogin(){
+            $("#button div").css({transform:"translate(105px)"})
+            $("#button #si").css({opacity:"1"})
+            $("#button #su").css({opacity:".5"})
+            $(".form").animate({ scrollLeft:500 }, 400);
+        }
+        async function regUser(event){
+            console.log("button working")
+            event.preventDefault();
+            const username = document.querySelector("#signup-form #username").value;
+            const fname = document.querySelector("#signup-form #fname").value;
+            const lname = document.querySelector("#signup-form #lname").value;
+            const password = document.querySelector("#signup-form #password").value;
+            const phnumber = document.querySelector("#signup-form #phnum").value;
+
+
+            const result = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                        'Content-Type' : 'application/json'
+                },
+                body: JSON.stringify({
+                    fname,
+                    lname,
+                    username,
+                    password,
+                    phnumber
+                })
+            }).then((res) => res.json())
+           if(result.status === 'ok'){
+            //    everything went fine!
+            alert("Successfully Registered")
+            turnlogin()
+           }
+           else{
+               alert(result.error)
+           }
+        }
+
+
+        //SIGNIN 
+        const signIn = document.querySelector("#signin-submit");
+        signIn.addEventListener('click', login);
+
+        // 1. Send data as JSON (very common) USING
+        // 2. Send data as urlencoded (by default)
+        async function login(event){
+            event.preventDefault();
+            const username = document.querySelector("#signin-form #susername").value;
+            const password = document.querySelector("#signin-form #spassword").value;
+
+            const result = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                        'Content-Type' : 'application/json'
+                },
+                body: JSON.stringify({
+                    username,
+                    password
+                })
+            }).then((res) => res.json())
+           if(result.status === 'ok'){
+            //    everything went fine!
+
+            localStorage.setItem("token",result.data)
+            localStorage.setItem("userID",result.userID)
+            console.log('User Logged In', result.userID)
+            window.location.href="/profile.html"
+            alert(result.message)
+           }
+           else{
+               alert(result.error)
+           }
+        }
+
+
+
+
+
+    </script>
+</body>
+</html>
